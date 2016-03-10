@@ -17,18 +17,21 @@
 package com.tuplejump.stargate.util;
 
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.QueryOptions;
 import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Session;
 import org.cassandraunit.dataset.CQLDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
  * User: satya
- *
+ * <p>
  * Dataloader implementation to use with CQLUnitD
  */
 public class CQLDataLoaderD {
@@ -50,7 +53,7 @@ public class CQLDataLoaderD {
         for (Map.Entry<String, Integer> entry : entries) {
             builder.addContactPoints(entry.getKey()).withPort(entry.getValue());
         }
-        Cluster cluster = builder.build();
+        Cluster cluster = builder.withQueryOptions(new QueryOptions().setFetchSize(getPageSize())).build();
         session = cluster.connect();
         return session;
     }
@@ -100,6 +103,18 @@ public class CQLDataLoaderD {
         String useQuery = "USE " + keyspaceName;
         log.debug("executing : " + useQuery);
         session.execute(useQuery);
+    }
+
+    private int getPageSize() {
+        Properties props = new Properties();
+        String size = new String();
+        try {
+            props.load(getClass().getClassLoader().getResourceAsStream("pagesize.properties"));
+            size = props.getProperty("pagesize");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return Integer.parseInt(size);
     }
 
 }

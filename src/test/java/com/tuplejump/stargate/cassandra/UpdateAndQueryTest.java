@@ -1,12 +1,25 @@
+/*
+ * Copyright 2014, Tuplejump Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.tuplejump.stargate.cassandra;
 
 import com.tuplejump.stargate.util.CQLUnitD;
 import junit.framework.Assert;
 import org.junit.Test;
 
-/**
- * Created by rajan on 7/14/15.
- */
 public class UpdateAndQueryTest extends IndexTestBase {
     String keyspace = "MY_KEYSPACE";
 
@@ -24,7 +37,6 @@ public class UpdateAndQueryTest extends IndexTestBase {
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
         Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
-
     }
 
     private void createTableAndIndex() {
