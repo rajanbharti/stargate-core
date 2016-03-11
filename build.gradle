@@ -158,6 +158,10 @@ signing {
     sign configurations.archives
 }
 
+test{
+    systemProperty "pagesize","5"
+}
+
 
 uploadArchives {
     repositories {
