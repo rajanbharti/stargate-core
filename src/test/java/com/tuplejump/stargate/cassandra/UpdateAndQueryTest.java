@@ -16,9 +16,15 @@
 
 package com.tuplejump.stargate.cassandra;
 
+import com.datastax.driver.core.Row;
 import com.tuplejump.stargate.util.CQLUnitD;
 import junit.framework.Assert;
+import com.datastax.driver.core.ResultSet;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class UpdateAndQueryTest extends IndexTestBase {
     String keyspace = "MY_KEYSPACE";
@@ -36,6 +42,14 @@ public class UpdateAndQueryTest extends IndexTestBase {
         getSession().execute("UPDATE PERSON SET eyeColor='black' WHERE id=7 AND email='avismosley@tetratrex.com'");
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
+        List<Integer> fetched = new LinkedList<Integer>();
+        List<Integer> expected = Arrays.asList(38, 34);
+        ResultSet resultSet = getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true);
+        List<Row> rows = resultSet.all();
+        rows.iterator().forEachRemaining(row -> {
+            fetched.add(row.getInt("age"));
+        });
+        Assert.assertEquals(expected, fetched);
         Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
     }
 

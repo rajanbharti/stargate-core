@@ -16,9 +16,15 @@
 
 package com.tuplejump.stargate.cassandra;
 
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
 import com.tuplejump.stargate.util.CQLUnitD;
 import junit.framework.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: satya
@@ -36,10 +42,22 @@ public class DropAndRecreateTest extends IndexTestBase {
         createKS(keyspace);
         createTableAndIndex(false);
         try {
+            List<String> fetchedKeys = new LinkedList<String>();
+            ResultSet resultSet = getResults("TAG", "", false);
+            resultSet.all().iterator().forEachRemaining(row -> {
+                fetchedKeys.add(row.getString("key"));
+            });
+            Assert.assertEquals(Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), fetchedKeys);
             Assert.assertEquals(8, countResults("TAG", "", false, false));
             Assert.assertEquals(3, countResults("TAG", "category = '" + mq("state", "CA") + "'", true));
             getSession().execute("DROP INDEX dropcreate;");
             createTableAndIndex(true);
+            fetchedKeys.clear();
+            resultSet = getResults("TAG", "", false);
+            resultSet.all().iterator().forEachRemaining(row -> {
+                fetchedKeys.add(row.getString("key"));
+            });
+            Assert.assertEquals(Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), fetchedKeys);
             Assert.assertEquals(8, countResults("TAG", "", false, false));
             Assert.assertEquals(3, countResults("TAG", "category = '" + mq("state", "CA") + "'", true));
         } finally {

@@ -26,6 +26,8 @@ import org.junit.Test;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 
@@ -60,10 +62,30 @@ public class BasicIndexTest extends IndexTestBase {
         try {
             createKS(keyspace);
             createTableAndIndexForRowNulls();
+            List<Integer> fetched = new LinkedList<Integer>();
+            getResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true).iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
             countResults("TAG_NULL", "", false, true);
+            Assert.assertEquals(Arrays.asList(16, 36, 6, 26), fetched);
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG_NULL", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true).iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(16, 36, 6, 26), fetched);
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG_NULL", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true).iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(16, 36, 6, 26), fetched);
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG_NULL", "magic = '" + mq("tags", "tag2") + "'", true).iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(13, 18, 19, 33, 38, 39, 3, 8, 9, 23, 28, 29), fetched);
             Assert.assertEquals(12, countResults("TAG_NULL", "magic = '" + mq("tags", "tag2") + "'", true));
 
         } finally {
@@ -79,23 +101,64 @@ public class BasicIndexTest extends IndexTestBase {
             createKS(keyspace);
             createTableAndIndexForRow();
             countResults("TAG2", "", false, true);
+            List<Integer> fetched = new LinkedList<Integer>();
+            getResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(11, 16, 18, 31, 36, 38, 1, 6, 8, 21, 26, 28), fetched);
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(11, 16, 18, 31, 36, 38, 1, 6, 8, 21, 26, 28), fetched);
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(16, 18, 36, 38, 6, 8, 26, 28), fetched);
             Assert.assertEquals(8, countResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
+            fetched.clear();
+            getResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(13, 14, 18, 19, 33, 34, 38, 39, 3, 4, 8, 9, 23, 24, 28, 29), fetched);
             Assert.assertEquals(16, countResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true));
 
             for (int i = 0; i < 40; i = i + 10) {
                 updateTagData("TAG2", (i + 1) + " AND segment =" + i);
             }
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "h*") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 31, 32, 33, 34, 35, 36, 37,
+                    38, 39, 40, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30), fetched);
             Assert.assertEquals(40, countResults("TAG2", "magic = '" + q("tags", "h*") + "'", true));
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(12, 13, 14, 32, 33, 34, 2, 3, 4, 22, 23, 24), fetched);
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true));
             int i = 0;
             while (i < 20) {
                 i = i + 10;
                 deleteTagData("TAG2", "segment", false, i);
             }
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(31, 32, 33, 34, 36, 37, 38, 39, 1, 2, 3, 4, 6, 7, 8, 9), fetched);
             Assert.assertEquals(16, countResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
-            Assert.assertEquals(5, countResults("TAG2", "magic = '" + q("tags", "hello*","state") + "' limit 5", true));
+            fetched.clear();
+            getResults("TAG2", "magic = '" + q("tags", "hello*", "state") + "' limit 5", true).all().iterator().forEachRemaining(row -> {
+                fetched.add(row.getInt("key"));
+            });
+            Assert.assertEquals(Arrays.asList(39, 34, 9, 4, 31), fetched);
+            Assert.assertEquals(5, countResults("TAG2", "magic = '" + q("tags", "hello*", "state") + "' limit 5", true));
             Assert.assertEquals(1, countStarResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
             Assert.assertEquals(1, countResults("TAG2", "segment=30 and key=36 AND magic = '" + mq("tags", "tag1") + "'", true));
             Assert.assertEquals(0, countResults("TAG2", "segment=20 and key=36 AND magic = '" + mq("tags", "tag1") + "'", true));
