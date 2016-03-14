@@ -37,19 +37,15 @@ public class UpdateAndQueryTest extends IndexTestBase {
     public void checkIndex() {
         createKS(keyspace);
         createTableAndIndex();
+        Record record = Record.getInstance();
+        record.setKeyspace(keyspace);
         Assert.assertEquals(3, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
         getSession().execute("UPDATE PERSON SET company='isologix1' WHERE id=10 AND email='weavercarson@isologix.com'");
         getSession().execute("UPDATE PERSON SET eyeColor='black' WHERE id=7 AND email='avismosley@tetratrex.com'");
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
-        List<Integer> fetched = new LinkedList<Integer>();
-        List<Integer> expected = Arrays.asList(38, 34);
-        ResultSet resultSet = getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true);
-        List<Row> rows = resultSet.all();
-        rows.iterator().forEachRemaining(row -> {
-            fetched.add(row.getInt("age"));
-        });
-        Assert.assertEquals(expected, fetched);
+        Assert.assertTrue(record.assertResult(getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true),
+                Arrays.asList(38, 34), "age"));
         Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
     }
 

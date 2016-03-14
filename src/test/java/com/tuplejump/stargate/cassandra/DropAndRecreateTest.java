@@ -41,23 +41,19 @@ public class DropAndRecreateTest extends IndexTestBase {
     public void shouldAllowToRecreateIndex() throws InterruptedException {
         createKS(keyspace);
         createTableAndIndex(false);
+        Record record = Record.getInstance();
+        record.setKeyspace(keyspace);
         try {
             List<String> fetchedKeys = new LinkedList<String>();
-            ResultSet resultSet = getResults("TAG", "", false);
-            resultSet.all().iterator().forEachRemaining(row -> {
-                fetchedKeys.add(row.getString("key"));
-            });
-            Assert.assertEquals(Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), fetchedKeys);
+            Assert.assertTrue(record.assertResult(getResults("TAG", "", false),
+                    Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), "key"));
             Assert.assertEquals(8, countResults("TAG", "", false, false));
             Assert.assertEquals(3, countResults("TAG", "category = '" + mq("state", "CA") + "'", true));
             getSession().execute("DROP INDEX dropcreate;");
             createTableAndIndex(true);
-            fetchedKeys.clear();
-            resultSet = getResults("TAG", "", false);
-            resultSet.all().iterator().forEachRemaining(row -> {
-                fetchedKeys.add(row.getString("key"));
-            });
-            Assert.assertEquals(Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), fetchedKeys);
+
+            Assert.assertTrue(record.assertResult(getResults("TAG", "", false),
+                    Arrays.asList("8", "7", "5", "6", "2", "3", "1", "4"), "key"));
             Assert.assertEquals(8, countResults("TAG", "", false, false));
             Assert.assertEquals(3, countResults("TAG", "category = '" + mq("state", "CA") + "'", true));
         } finally {

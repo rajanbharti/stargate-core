@@ -106,9 +106,7 @@ public class CQLDataLoaderD {
     }
 
     private int getPageSize() {
-        Properties props = new Properties(System.getProperties());
-        String size = props.getProperty("pagesize", "100");
-        return Integer.parseInt(size);
+        return Integer.parseInt(System.getProperty("pagesize", "100"));
     }
 
 }
