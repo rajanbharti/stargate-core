@@ -20,6 +20,7 @@ import com.datastax.driver.core.ResultSet;
 import com.datastax.driver.core.Row;
 import com.tuplejump.stargate.StargateMBean;
 import com.tuplejump.stargate.util.CQLUnitD;
+import com.tuplejump.stargate.util.Record;
 import junit.framework.Assert;
 import org.junit.Test;
 
@@ -62,22 +63,21 @@ public class BasicIndexTest extends IndexTestBase {
         try {
             createKS(keyspace);
             createTableAndIndexForRowNulls();
-            Record record = Record.getInstance();
-            record.setKeyspace(keyspace);
+
             countResults("TAG_NULL", "", false, true);
-            Assert.assertTrue(record.assertResult(getResults("TAG_NULL", "magic = '"
+            Assert.assertTrue(assertResult(getResults("TAG_NULL", "magic = '"
                     + q("tags", "tags:hello* AND state:CA") + "'", true), Arrays.asList(16, 36, 6, 26), "key"));
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG_NULL", "magic = '" +
+            Assert.assertTrue(assertResult(getResults("TAG_NULL", "magic = '" +
                     q("tags", "tags:hello? AND state:CA") + "'", true), Arrays.asList(16, 36, 6, 26), "key"));
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG_NULL", "magic = '" +
+            Assert.assertTrue(assertResult(getResults("TAG_NULL", "magic = '" +
                     q("tags", "tags:hello2 AND state:CA") + "'", true), Arrays.asList(16, 36, 6, 26), "key"));
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG_NULL", "magic = '" +
+            Assert.assertTrue(assertResult(getResults("TAG_NULL", "magic = '" +
                     mq("tags", "tag2") + "'", true), Arrays.asList(13, 18, 19, 33, 38, 39, 3, 8, 9, 23, 28, 29), "key"));
             Assert.assertEquals(12, countResults("TAG_NULL", "magic = '" + mq("tags", "tag2") + "'", true));
 
@@ -93,23 +93,23 @@ public class BasicIndexTest extends IndexTestBase {
         try {
             createKS(keyspace);
             createTableAndIndexForRow();
-            Record record = Record.getInstance();
-            record.setKeyspace(keyspace);
+            ResultSet resultSet = getResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true);
+
             countResults("TAG2", "", false, true);
             List<Integer> fetched = new LinkedList<Integer>();
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA")
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA")
                     + "'", true), Arrays.asList(11, 16, 18, 31, 36, 38, 1, 6, 8, 21, 26, 28), "key"));
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA")
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA")
                     + "'", true), Arrays.asList(11, 16, 18, 31, 36, 38, 1, 6, 8, 21, 26, 28), "key"));
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA")
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA")
                     + "'", true), Arrays.asList(16, 18, 36, 38, 6, 8, 26, 28), "key"));
             Assert.assertEquals(8, countResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true),
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true),
                     Arrays.asList(13, 14, 18, 19, 33, 34, 38, 39, 3, 4, 8, 9, 23, 24, 28, 29), "key"));
             Assert.assertEquals(16, countResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true));
 
@@ -117,12 +117,12 @@ public class BasicIndexTest extends IndexTestBase {
                 updateTagData("TAG2", (i + 1) + " AND segment =" + i);
             }
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "h*") + "'", true),
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "h*") + "'", true),
                     Arrays.asList(11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 31, 32, 33, 34, 35, 36, 37,
                             38, 39, 40, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30), "key"));
             Assert.assertEquals(40, countResults("TAG2", "magic = '" + q("tags", "h*") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true),
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true),
                     Arrays.asList(12, 13, 14, 32, 33, 34, 2, 3, 4, 22, 23, 24), "key"));
             Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true));
             int i = 0;
@@ -131,11 +131,11 @@ public class BasicIndexTest extends IndexTestBase {
                 deleteTagData("TAG2", "segment", false, i);
             }
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true),
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true),
                     Arrays.asList(31, 32, 33, 34, 36, 37, 38, 39, 1, 2, 3, 4, 6, 7, 8, 9), "key"));
             Assert.assertEquals(16, countResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
 
-            Assert.assertTrue(record.assertResult(getResults("TAG2", "magic = '" + q("tags", "hello*", "state") +
+            Assert.assertTrue(assertResult(getResults("TAG2", "magic = '" + q("tags", "hello*", "state") +
                     "' limit 5", true), Arrays.asList(39, 34, 9, 4, 31), "key"));
             Assert.assertEquals(5, countResults("TAG2", "magic = '" + q("tags", "hello*", "state") + "' limit 5", true));
             Assert.assertEquals(1, countStarResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
@@ -226,7 +226,9 @@ public class BasicIndexTest extends IndexTestBase {
             if (i == 20) {
                 getSession().execute("CREATE CUSTOM INDEX ntagsandstate ON TAG_NULL(magic) USING 'com.tuplejump.stargate.RowIndex' WITH options ={'sg_options':'" + options + "'}");
             }
-            getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 1) + ",null, 'CA'," + i + ")");
+          //  getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 1) + ",null, 'CA'," + i + ")");
+            Record r1 = new Record("key,tags,state,segment", (i + 1) + ",null, 'CA'," + i,"int,text,varchar,int,text");
+            insertRecord(keyspace,"TAG_NULL",r1);
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 2) + ",'hello1 tag1 lol2', null," + i + ")");
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 3) + ",'hello1 tag2 lol1', 'NY'," + i + ")");
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 4) + ",null, 'TX'," + i + ")");

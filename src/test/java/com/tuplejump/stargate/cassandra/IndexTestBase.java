@@ -22,8 +22,10 @@ import com.datastax.driver.core.Session;
 import com.google.common.base.Joiner;
 import com.tuplejump.stargate.lucene.Properties;
 import com.tuplejump.stargate.util.CQLUnitD;
+import com.tuplejump.stargate.util.Record;
 import junit.framework.Assert;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.compound.hyphenation.TernaryTree;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.DirectoryReader;
@@ -410,6 +412,34 @@ public class IndexTestBase {
             getSession().execute(stmt);
         }
 
+    }
+
+    public void insertRecord(String keyspace, String tName, Record record) {
+        getSession().execute("insert into " + keyspace + "." + tName + "(" + record.getFieldsString() + ") values(" + record.getValuesString() + ");");
+    }
+
+
+    public boolean assertRecords(ResultSet resultSet, List<Record> records) {
+        List<Record> fetched = new LinkedList<Record>();
+        for (int i = 0; i < resultSet.all().size(); i++) {
+            resultSet.all().iterator().forEachRemaining(row -> {
+                Record tempRecord = new Record(row);
+                fetched.add(tempRecord);
+            });
+        }
+        if (fetched == records)
+            return true;
+        else
+            return false;
+    }
+
+
+    public boolean assertResult(ResultSet resultSet, List expected, String key) {
+        List<Object> fetched = new LinkedList<Object>();
+        resultSet.all().iterator().forEachRemaining(row -> {
+            fetched.add(row.getObject(key));
+        });
+        return (expected.equals(fetched));
     }
 
 
