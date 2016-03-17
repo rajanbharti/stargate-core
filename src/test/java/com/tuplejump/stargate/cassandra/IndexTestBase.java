@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.SyncFailedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileAttribute;
@@ -418,19 +419,26 @@ public class IndexTestBase {
         getSession().execute("insert into " + keyspace + "." + tName + "(" + record.getFieldsString() + ") values(" + record.getValuesString() + ");");
     }
 
+    public List<Record> getRecords(ResultSet resultSet) {
+        List<Record> fetched = new ArrayList<Record>();
+
+        resultSet.all().iterator().forEachRemaining(row -> {
+            Record tempRecord = new Record(row);
+            fetched.add(tempRecord);
+        });
+        return fetched;
+    }
+
 
     public boolean assertRecords(ResultSet resultSet, List<Record> records) {
-        List<Record> fetched = new LinkedList<Record>();
-        for (int i = 0; i < resultSet.all().size(); i++) {
-            resultSet.all().iterator().forEachRemaining(row -> {
-                Record tempRecord = new Record(row);
-                fetched.add(tempRecord);
-            });
-        }
-        if (fetched == records)
-            return true;
-        else
-            return false;
+        List<Record> fetched = getRecords(resultSet);
+        records.forEach(x -> {
+            System.out.println(x.toString());
+        });
+        fetched.forEach(x -> {
+            System.out.println(x.toString());
+        });
+        return fetched.equals(records);
     }
 
 

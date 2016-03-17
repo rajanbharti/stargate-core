@@ -2,25 +2,25 @@ package com.tuplejump.stargate.util;
 
 import com.datastax.driver.core.Row;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Record {
 
-    private List<String> recordDefinition = new LinkedList<String>();
-
+    private Map recordDefinition = new HashMap<String, String>();
     private Map record = new HashMap<String, Object>();
 
-    public Record(String field, String values, String def) {
-        String[] fieldList = field.split(",");
-        String[] valueList = values.split(",");
-        String[] definition = def.split(",");
-        if (fieldList.length == valueList.length) {
-            for (int i = 0; i < fieldList.length; i++)
-                if (definition[i] == "int")
-                    record.put(fieldList[i], Integer.parseInt(valueList[i]));
-                else
-                    record.put(fieldList[i], valueList[i]);
-
+    public Record(String[] field, Object[] values, String[] type) {
+        if (field.length == values.length) {
+            for (int i = 0; i < field.length; i++) {
+                recordDefinition.put(field[i], type[i]);
+              /*  if (type[i] == "int")
+                    record.put(field[i], values[i]);
+                else if (type[i] == "boolean")
+                    record.put(field[i], values[i]);
+                else*/
+                record.put(field[i], values[i].toString());
+            }
         }
     }
 
@@ -29,14 +29,30 @@ public class Record {
     }
 
     public Record(Row row) {
-        Map fetched = new HashMap<String, Object>();
-        List columns = row.getColumnDefinitions().asList();
-        columns.iterator().forEachRemaining(col -> {
-            fetched.put(col, row.getObject(col.toString()));
+        List<String> fields = new ArrayList<>();
+        //   List<String> types = new ArrayList<String>();
+        row.getColumnDefinitions().iterator().forEachRemaining(c -> {
+            fields.add(c.getName());
+            //  types.add(c.getType().toString());
         });
-        record = fetched;
+        fields.remove("stargate");
+        fields.iterator().forEachRemaining(col -> {
+            record.put(col, row.getObject(col).toString());
+        });
     }
 
+    public String getFieldsString() {
+        Iterator it = record.entrySet().iterator();
+        List<String> fieldList = new ArrayList<String>(record.keySet());
+        return mkString(fieldList);
+    }
+
+    public String getValuesString() {
+        Iterator it = record.entrySet().iterator();
+        List<String> valueList = new ArrayList<String>(record.values());
+        List<String> types = new ArrayList<String>(recordDefinition.values());
+        return mkString(valueList, types);
+    }
 
     private String mkString(List<String> list) {
         StringBuilder result = new StringBuilder();
@@ -47,18 +63,20 @@ public class Record {
         return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
     }
 
-    public String getFieldsString() {
-        Map data = record;
-        Iterator it = data.entrySet().iterator();
-        List<String> fieldList = new ArrayList<String>(data.keySet());
-        return mkString(fieldList);
-    }
-
-    public String getValuesString() {
-        Map data = record;
-        Iterator it = data.entrySet().iterator();
-        List<String> valueList = new ArrayList<String>(data.values());
-        return mkString(valueList);
+    private String mkString(List<String> list, List<String> recordDefinition) {
+        StringBuilder result = new StringBuilder();
+        int i = 0;
+        for (Object s : list) {
+            if (recordDefinition.get(i) == "int" || recordDefinition.get(i) == "boolean") {
+                result.append(s.toString());
+                result.append(",");
+            } else {
+                result.append("'" + s.toString() + "'");
+                result.append(",");
+            }
+            i++;
+        }
+        return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
     }
 
     public Map getRecord() {

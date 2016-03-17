@@ -65,6 +65,7 @@ public class BasicIndexTest extends IndexTestBase {
             createTableAndIndexForRowNulls();
 
             countResults("TAG_NULL", "", false, true);
+            getRecords(getResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
             Assert.assertTrue(assertResult(getResults("TAG_NULL", "magic = '"
                     + q("tags", "tags:hello* AND state:CA") + "'", true), Arrays.asList(16, 36, 6, 26), "key"));
             Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
@@ -226,9 +227,9 @@ public class BasicIndexTest extends IndexTestBase {
             if (i == 20) {
                 getSession().execute("CREATE CUSTOM INDEX ntagsandstate ON TAG_NULL(magic) USING 'com.tuplejump.stargate.RowIndex' WITH options ={'sg_options':'" + options + "'}");
             }
-          //  getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 1) + ",null, 'CA'," + i + ")");
-            Record r1 = new Record("key,tags,state,segment", (i + 1) + ",null, 'CA'," + i,"int,text,varchar,int,text");
-            insertRecord(keyspace,"TAG_NULL",r1);
+            getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 1) + ",null, 'CA'," + i + ")");
+         //   Record r1 = new Record("key,tags,state,segment", (i + 1) + ",null, 'CA'," + i, "int,text,varchar,int,text");
+          //  insertRecord(keyspace, "TAG_NULL", r1);
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 2) + ",'hello1 tag1 lol2', null," + i + ")");
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 3) + ",'hello1 tag2 lol1', 'NY'," + i + ")");
             getSession().execute("insert into " + keyspace + ".TAG_NULL (key,tags,state,segment) values (" + (i + 4) + ",null, 'TX'," + i + ")");
