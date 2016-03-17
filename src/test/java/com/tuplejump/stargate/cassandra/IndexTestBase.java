@@ -429,18 +429,9 @@ public class IndexTestBase {
         return fetched;
     }
 
-
-    public boolean assertRecords(ResultSet resultSet, List<Record> records) {
-        List<Record> fetched = getRecords(resultSet);
-        records.forEach(x -> {
-            System.out.println(x.toString());
-        });
-        fetched.forEach(x -> {
-            System.out.println(x.toString());
-        });
-        return fetched.equals(records);
+    public int getRecordCount(ResultSet resultSet) {
+        return resultSet.all().size();
     }
-
 
     public boolean assertResult(ResultSet resultSet, List expected, String key) {
         List<Object> fetched = new LinkedList<Object>();

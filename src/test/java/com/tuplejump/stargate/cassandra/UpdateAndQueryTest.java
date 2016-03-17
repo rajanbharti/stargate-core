@@ -32,7 +32,7 @@ public class UpdateAndQueryTest extends IndexTestBase {
     }
 
     String[] fields = {"id", "isActive", "age", "eyeColor", "name", "gender", "company", "email", "phone", "address"};
-    String[] def = {"int", "boolean", "int", "varchar", "text", "varchar", "varchar", "varchar", "varchar", "text", "text"};
+    String[] def = {"int", "boolean", "int", "varchar", "text", "varchar", "varchar", "varchar", "varchar", "text"};
     Record r1 = new Record(fields, new Object[]{10, false, 38, "blue", "Weaver Carson", "male", "isologix1", "weavercarson@isologix.com", "+1 (916) 566-2681", "560 Hanson Place, Gardners, Puerto Rico, 7821"}, def);
     Record r7 = new Record(fields, new Object[]{7, true, 34, "black", "Avis Mosley", "female", "TETRATREX", "avismosley@tetratrex.com", "+1 (883) 461-3832", "391 Heyward Street, Hayes, Alabama, 5934"}, def);
 
