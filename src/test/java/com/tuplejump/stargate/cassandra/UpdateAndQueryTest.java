@@ -49,8 +49,6 @@ public class UpdateAndQueryTest extends IndexTestBase {
         String fields = "id,isActive,age,eyeColor,name,gender,company,email,phone,address";
         String def = "int,boolean,int,varchar,text,varchar,varchar,varchar,varchar,text,text";
         List<Record> expected = Arrays.asList(r1, r7);
-
-        System.out.println(assertRecords(getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true), expected));
         List<Record> records = getRecords(getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true));
         Assert.assertEquals(expected, records);
         // getRecords(getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true));

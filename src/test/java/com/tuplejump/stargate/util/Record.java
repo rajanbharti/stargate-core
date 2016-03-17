@@ -35,7 +35,8 @@ public class Record {
             fields.add(c.getName());
             //  types.add(c.getType().toString());
         });
-        fields.remove("stargate");
+        if (fields.contains("stargate"))
+            fields.remove("stargate");
         fields.iterator().forEachRemaining(col -> {
             record.put(col, row.getObject(col).toString());
         });
