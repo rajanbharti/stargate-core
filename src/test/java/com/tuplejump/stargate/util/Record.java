@@ -8,18 +8,13 @@ import java.util.*;
 public class Record {
 
     private Map recordDefinition = new HashMap<String, String>();
-    private Map record = new HashMap<String, Object>();
+    private Map<String, Object> record = new HashMap<String, Object>();
 
-    public Record(String[] field, Object[] values, String[] type) {
-        if (field.length == values.length) {
-            for (int i = 0; i < field.length; i++) {
-                recordDefinition.put(field[i], type[i]);
-              /*  if (type[i] == "int")
-                    record.put(field[i], values[i]);
-                else if (type[i] == "boolean")
-                    record.put(field[i], values[i]);
-                else*/
-                record.put(field[i], values[i].toString());
+    public Record(String[] fields, Object[] values, String[] type) {
+        if (fields.length == values.length) {
+            for (int i = 0; i < fields.length; i++) {
+                recordDefinition.put(fields[i].toLowerCase(), type[i]);
+                record.put(fields[i].toLowerCase(), values[i]);
             }
         }
     }
@@ -28,18 +23,12 @@ public class Record {
         this.record = record;
     }
 
-    public Record(Row row) {
-        List<String> fields = new ArrayList<>();
-        //   List<String> types = new ArrayList<String>();
-        row.getColumnDefinitions().iterator().forEachRemaining(c -> {
-            fields.add(c.getName());
-            //  types.add(c.getType().toString());
+    public Record(Row row, String indexCol) {
+        row.getColumnDefinitions().iterator().forEachRemaining(field -> {
+            String col = field.getName();
+            record.put(col.toLowerCase(), row.getObject(col));
         });
-        if (fields.contains("stargate"))
-            fields.remove("stargate");
-        fields.iterator().forEachRemaining(col -> {
-            record.put(col, row.getObject(col).toString());
-        });
+        record.remove(indexCol);
     }
 
     public String getFieldsString() {
@@ -50,7 +39,7 @@ public class Record {
 
     public String getValuesString() {
         Iterator it = record.entrySet().iterator();
-        List<String> valueList = new ArrayList<String>(record.values());
+        List<Object> valueList = new ArrayList<Object>(record.values());
         List<String> types = new ArrayList<String>(recordDefinition.values());
         return mkString(valueList, types);
     }
@@ -64,7 +53,7 @@ public class Record {
         return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
     }
 
-    private String mkString(List<String> list, List<String> recordDefinition) {
+    private String mkString(List<Object> list, List<String> recordDefinition) {
         StringBuilder result = new StringBuilder();
         int i = 0;
         for (Object s : list) {
@@ -72,7 +61,10 @@ public class Record {
                 result.append(s.toString());
                 result.append(",");
             } else {
-                result.append("'" + s.toString() + "'");
+                if (s == null)
+                    result.append("null");
+                else
+                    result.append("'" + s.toString() + "'");
                 result.append(",");
             }
             i++;

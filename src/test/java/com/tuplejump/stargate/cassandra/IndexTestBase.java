@@ -419,18 +419,20 @@ public class IndexTestBase {
         getSession().execute("insert into " + keyspace + "." + tName + "(" + record.getFieldsString() + ") values(" + record.getValuesString() + ");");
     }
 
-    public List<Record> getRecords(ResultSet resultSet) {
-        List<Record> fetched = new ArrayList<Record>();
+    public void insertRecords(String keyspace, String tName, List<Record> records) {
+        records.forEach(rec -> {
+            insertRecord(keyspace, tName, rec);
+        });
+    }
 
+    public List<Record> getRecords(String tName, String where, boolean hasWhr,String indexCol) {
+        ResultSet resultSet = getResults(tName, where, hasWhr);
+        List<Record> fetched = new ArrayList<Record>();
         resultSet.all().iterator().forEachRemaining(row -> {
-            Record tempRecord = new Record(row);
+            Record tempRecord = new Record(row,indexCol);
             fetched.add(tempRecord);
         });
         return fetched;
-    }
-
-    public int getRecordCount(ResultSet resultSet) {
-        return resultSet.all().size();
     }
 
     public boolean assertResult(ResultSet resultSet, List expected, String key) {
