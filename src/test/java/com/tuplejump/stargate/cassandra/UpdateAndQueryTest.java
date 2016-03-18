@@ -48,7 +48,6 @@ public class UpdateAndQueryTest extends IndexTestBase {
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
         Assert.assertEquals(Arrays.asList(r9_new, r7_new), getRecords("PERSON", "stargate='" + gtq("age", "30") + "'", true, "stargate"));
-        Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
     }
 
     private void createTableAndIndex() {

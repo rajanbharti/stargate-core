@@ -68,24 +68,19 @@ public class BasicIndexTest extends IndexTestBase {
             countResults("TAG_NULL", "", false, true);
             Assert.assertEquals(Arrays.asList(recordsForRowNulls.get(15), recordsForRowNulls.get(35), recordsForRowNulls.get(5),
                     recordsForRowNulls.get(25)), getRecords("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRowNulls.get(15), recordsForRowNulls.get(35), recordsForRowNulls.get(5),
                     recordsForRowNulls.get(25)), getRecords("TAG_NULL", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRowNulls.get(15), recordsForRowNulls.get(35),
                     recordsForRowNulls.get(5), recordsForRowNulls.get(25)),
                     getRecords("TAG_NULL", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(4, countResults("TAG_NULL", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRowNulls.get(12), recordsForRowNulls.get(17),
                     recordsForRowNulls.get(18), recordsForRowNulls.get(32), recordsForRowNulls.get(37),
                     recordsForRowNulls.get(38), recordsForRowNulls.get(2), recordsForRowNulls.get(7),
                     recordsForRowNulls.get(8), recordsForRowNulls.get(22), recordsForRowNulls.get(27),
                     recordsForRowNulls.get(28)), getRecords("TAG_NULL", "magic = '" + mq("tags", "tag2") + "'", true, "magic"));
-            Assert.assertEquals(12, countResults("TAG_NULL", "magic = '" + mq("tags", "tag2") + "'", true));
-
         } finally {
             dropTable(keyspace, "TAG_NULL");
             dropKS(keyspace);
@@ -101,30 +96,25 @@ public class BasicIndexTest extends IndexTestBase {
             ResultSet resultSet = getResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true);
 
             countResults("TAG2", "", false, true);
-            List<Integer> fetched = new LinkedList<Integer>();
             Assert.assertEquals(Arrays.asList(recordsForRow.get(10), recordsForRow.get(15), recordsForRow.get(17),
                     recordsForRow.get(30), recordsForRow.get(35), recordsForRow.get(37), recordsForRow.get(0),
                     recordsForRow.get(5), recordsForRow.get(7), recordsForRow.get(20), recordsForRow.get(25),
                     recordsForRow.get(27)), getRecords("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello* AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRow.get(10), recordsForRow.get(15), recordsForRow.get(17),
                     recordsForRow.get(30), recordsForRow.get(35), recordsForRow.get(37), recordsForRow.get(0),
                     recordsForRow.get(5), recordsForRow.get(7), recordsForRow.get(20), recordsForRow.get(25),
                     recordsForRow.get(27)), getRecords("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "tags:hello? AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRow.get(15), recordsForRow.get(17), recordsForRow.get(35),
                     recordsForRow.get(37), recordsForRow.get(5), recordsForRow.get(7), recordsForRow.get(25),
                     recordsForRow.get(27)), getRecords("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true, "magic"));
-            Assert.assertEquals(8, countResults("TAG2", "magic = '" + q("tags", "tags:hello2 AND state:CA") + "'", true));
 
             Assert.assertEquals(Arrays.asList(recordsForRow.get(12), recordsForRow.get(13), recordsForRow.get(17),
                     recordsForRow.get(18), recordsForRow.get(32), recordsForRow.get(33), recordsForRow.get(37),
                     recordsForRow.get(38), recordsForRow.get(2), recordsForRow.get(3), recordsForRow.get(7),
                     recordsForRow.get(8), recordsForRow.get(22), recordsForRow.get(23), recordsForRow.get(27),
                     recordsForRow.get(28)), getRecords("TAG2", "magic = '" + mq("tags", "tag2") + "'", true, "magic"));
-            Assert.assertEquals(16, countResults("TAG2", "magic = '" + mq("tags", "tag2") + "'", true));
 
             for (int i = 0; i < 40; i = i + 10) {
                 updateTagData("TAG2", (i + 1) + " AND segment =" + i);
@@ -147,26 +137,22 @@ public class BasicIndexTest extends IndexTestBase {
                     recordsForRow.get(22), recordsForRow.get(23), recordsForRow.get(24), recordsForRow.get(25),
                     recordsForRow.get(26), recordsForRow.get(27), recordsForRow.get(28), recordsForRow.get(29)),
                     getRecords("TAG2", "magic = '" + q("tags", "h*") + "'", true, "magic"));
-            Assert.assertEquals(40, countResults("TAG2", "magic = '" + q("tags", "h*") + "'", true));
 
             Assert.assertEquals(getRecords("TAG2", "magic = '" + q("tags", "hello1") + "'", true, "magic"), Arrays.asList(
                     recordsForRow.get(11), recordsForRow.get(12), recordsForRow.get(13), recordsForRow.get(31),
                     recordsForRow.get(32), recordsForRow.get(33), recordsForRow.get(1), recordsForRow.get(2),
                     recordsForRow.get(3), recordsForRow.get(21), recordsForRow.get(22), recordsForRow.get(23)));
-            Assert.assertEquals(12, countResults("TAG2", "magic = '" + q("tags", "hello1") + "'", true));
             int i = 0;
             while (i < 20) {
                 i = i + 10;
                 deleteTagData("TAG2", "segment", false, i);
             }
-
             Assert.assertEquals(Arrays.asList(updated31, recordsForRow.get(31), recordsForRow.get(32), recordsForRow.get(33),
                     recordsForRow.get(35), recordsForRow.get(36), recordsForRow.get(37), recordsForRow.get(38),
                     updated01, recordsForRow.get(1), recordsForRow.get(2), recordsForRow.get(3), recordsForRow.get(5),
                     recordsForRow.get(6), recordsForRow.get(7), recordsForRow.get(8)),
                     getRecords("TAG2", "magic = '" + q("tags", "hello*") + "'", true, "magic"));
-            Assert.assertEquals(16, countResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
-            countResults("TAG2", "magic = '" + q("tags", "hello*", "state") + "'", true);
+
             //TODO: Ordering of sorted result
             Assert.assertEquals(5, countResults("TAG2", "magic = '" + q("tags", "hello*", "state") + "' limit 5", true));
             Assert.assertEquals(1, countStarResults("TAG2", "magic = '" + q("tags", "hello*") + "'", true));
