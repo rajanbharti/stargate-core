@@ -41,12 +41,13 @@ public class UpdateAndQueryTest extends IndexTestBase {
         createKS(keyspace);
         createTableAndIndex();
         Record r7_new = new Record(fields, new Object[]{7, true, 34, "black", "Avis Mosley", "female", "TETRATREX", "avismosley@tetratrex.com", "+1 (883) 461-3832", "391 Heyward Street, Hayes, Alabama, 5934"}, fieldTypes);
+        Record r9_new = new Record(fields, new Object[]{10, false, 38, "blue", "Weaver Carson", "male", "isologix1", "weavercarson@isologix.com", "+1 (916) 566-2681", "560 Hanson Place, Gardners, Puerto Rico, 7821"}, fieldTypes);
         Assert.assertEquals(3, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
         getSession().execute("UPDATE PERSON SET company='isologix1' WHERE id=10 AND email='weavercarson@isologix.com'");
         getSession().execute("UPDATE PERSON SET eyeColor='black' WHERE id=7 AND email='avismosley@tetratrex.com'");
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
-        Assert.assertEquals(Arrays.asList(records.get(9), r7_new), getRecords("PERSON", "stargate='" + gtq("age", "30") + "'", true, "stargate"));
+        Assert.assertEquals(Arrays.asList(r9_new, r7_new), getRecords("PERSON", "stargate='" + gtq("age", "30") + "'", true, "stargate"));
         Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
     }
 
@@ -67,7 +68,7 @@ public class UpdateAndQueryTest extends IndexTestBase {
         Record r7 = new Record(fields, new Object[]{7, true, 34, "brown", "Avis Mosley", "female", "TETRATREX", "avismosley@tetratrex.com", "+1 (883) 461-3832", "391 Heyward Street, Hayes, Alabama, 5934"}, fieldTypes);
         Record r8 = new Record(fields, new Object[]{8, false, 29, "black", "Juana Ewing", "female", "REPETWIRE", "juanaewing@repetwire.com", "+1 (809) 410-2791", "510 Lake Avenue, Austinburg, Virgin Islands, 2964"}, fieldTypes);
         Record r9 = new Record(fields, new Object[]{9, false, 33, "brown", "Edwards Patton", "male", "MANGELICA", "edwardspatton@mangelica.com", "+1 (977) 508-2935", "131 Stone Avenue, Cucumber, Minnesota, 4601"}, fieldTypes);
-        Record r10 = new Record(fields, new Object[]{10, false, 38, "blue", "Weaver Carson", "male", "isologix1", "weavercarson@isologix.com", "+1 (916) 566-2681", "560 Hanson Place, Gardners, Puerto Rico, 7821"}, fieldTypes);
+        Record r10 = new Record(fields, new Object[]{10, false, 38, "blue", "Weaver Carson", "male", "ISOLOGIX", "weavercarson@isologix.com", "+1 (916) 566-2681", "560 Hanson Place, Gardners, Puerto Rico, 7821"}, fieldTypes);
         records.addAll(Arrays.asList(r1, r2, r3, r4, r5, r6, r7, r8, r9, r10));
         insertRecords(keyspace, tName, records);
     }
