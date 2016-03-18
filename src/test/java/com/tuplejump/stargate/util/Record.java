@@ -19,10 +19,6 @@ public class Record {
         }
     }
 
-    Record(Map record) {
-        this.record = record;
-    }
-
     public Record(Row row, String indexCol) {
         row.getColumnDefinitions().iterator().forEachRemaining(field -> {
             String col = field.getName();
@@ -31,17 +27,18 @@ public class Record {
         record.remove(indexCol);
     }
 
-    public String getFieldsString() {
+    public String getInsertString() {
         Iterator it = record.entrySet().iterator();
-        List<String> fieldList = new ArrayList<String>(record.keySet());
-        return mkString(fieldList);
-    }
-
-    public String getValuesString() {
-        Iterator it = record.entrySet().iterator();
-        List<Object> valueList = new ArrayList<Object>(record.values());
-        List<String> types = new ArrayList<String>(recordDefinition.values());
-        return mkString(valueList, types);
+        List<String> fieldList = new ArrayList<String>();
+        List<Object> valueList = new ArrayList<Object>();
+        List<String> types = new ArrayList<String>();
+        while (it.hasNext()) {
+            Map.Entry map = (Map.Entry) it.next();
+            fieldList.add((String) map.getKey());
+            valueList.add(map.getValue());
+            types.add((String) recordDefinition.get(map.getKey()));
+        }
+        return "(" + mkString(fieldList) + ")values(" + mkString(valueList, types) + ");";
     }
 
     private String mkString(List<String> list) {
@@ -57,15 +54,16 @@ public class Record {
         StringBuilder result = new StringBuilder();
         int i = 0;
         for (Object s : list) {
-            if (recordDefinition.get(i) == "int" || recordDefinition.get(i) == "boolean") {
-                result.append(s.toString());
-                result.append(",");
+            if (s == null) {
+                result.append("null,");
             } else {
-                if (s == null)
-                    result.append("null");
-                else
+                if (recordDefinition.get(i) == "int" || recordDefinition.get(i) == "boolean" || recordDefinition.get(i) == "bigint") {
+                    result.append(s.toString());
+                    result.append(",");
+                } else {
                     result.append("'" + s.toString() + "'");
-                result.append(",");
+                    result.append(",");
+                }
             }
             i++;
         }

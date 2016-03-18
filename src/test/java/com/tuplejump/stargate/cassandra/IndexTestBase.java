@@ -416,7 +416,7 @@ public class IndexTestBase {
     }
 
     public void insertRecord(String keyspace, String tName, Record record) {
-        getSession().execute("insert into " + keyspace + "." + tName + "(" + record.getFieldsString() + ") values(" + record.getValuesString() + ");");
+        getSession().execute("insert into " + keyspace + "." + tName + record.getInsertString());
     }
 
     public void insertRecords(String keyspace, String tName, List<Record> records) {
@@ -425,23 +425,13 @@ public class IndexTestBase {
         });
     }
 
-    public List<Record> getRecords(String tName, String where, boolean hasWhr,String indexCol) {
+    public List<Record> getRecords(String tName, String where, boolean hasWhr, String indexCol) {
         ResultSet resultSet = getResults(tName, where, hasWhr);
         List<Record> fetched = new ArrayList<Record>();
         resultSet.all().iterator().forEachRemaining(row -> {
-            Record tempRecord = new Record(row,indexCol);
+            Record tempRecord = new Record(row, indexCol);
             fetched.add(tempRecord);
         });
         return fetched;
     }
-
-    public boolean assertResult(ResultSet resultSet, List expected, String key) {
-        List<Object> fetched = new LinkedList<Object>();
-        resultSet.all().iterator().forEachRemaining(row -> {
-            fetched.add(row.getObject(key));
-        });
-        return (expected.equals(fetched));
-    }
-
-
 }

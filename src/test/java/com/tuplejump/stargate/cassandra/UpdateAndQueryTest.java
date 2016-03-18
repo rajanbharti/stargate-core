@@ -46,11 +46,7 @@ public class UpdateAndQueryTest extends IndexTestBase {
         getSession().execute("UPDATE PERSON SET eyeColor='black' WHERE id=7 AND email='avismosley@tetratrex.com'");
         getSession().execute("UPDATE PERSON SET age=27 WHERE id=9 AND email='edwardspatton@mangelica.com'");
         //we set age to 27..this should now result only in 2 docs
-        List<Record> expected = Arrays.asList(records.get(9), r7_new);
-        List<Record> records = getRecords("PERSON", "stargate='" + gtq("age", "30") + "'", true,"stargate");
-        Assert.assertEquals(expected, records);
-        Assert.assertTrue(assertResult(getResults("PERSON", "stargate='" + gtq("age", "30") + "'", true),
-                Arrays.asList(38, 34), "age"));
+        Assert.assertEquals(Arrays.asList(records.get(9), r7_new), getRecords("PERSON", "stargate='" + gtq("age", "30") + "'", true, "stargate"));
         Assert.assertEquals(2, countResults("PERSON", "stargate='" + gtq("age", "30") + "'", true, true));
     }
 
