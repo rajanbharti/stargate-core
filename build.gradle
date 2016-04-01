@@ -31,6 +31,7 @@ dependencies {
 
     //lucene dependencies
     compile group: 'org.apache.lucene', name: 'lucene-core', version: luceneVersion
+    compile group: 'org.apache.lucene', name: 'lucene-sandbox', version: luceneVersion
     compile group: 'org.apache.lucene', name: 'lucene-spatial', version: luceneVersion
     compile group: 'org.apache.lucene', name: 'lucene-analyzers-common', version: luceneVersion
     compile("org.apache.lucene:lucene-queryparser:$luceneVersion") {
@@ -56,7 +57,10 @@ dependencies {
     compile('org.javolution:javolution:5.3.1')
 
     //testing dependencies
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.11',
+            'org.powermock:powermock-core:1.5.6',
+            'org.powermock:powermock-module-junit4:1.5.6',
+            'org.powermock:powermock-api-mockito:1.5.6'
 
     testCompile('com.datastax.cassandra:cassandra-driver-core:2.1.8') {
         exclude group: 'org.apache.cassandra', module: 'cassandra-all'
@@ -109,7 +113,7 @@ task copyJarToCCM(dependsOn: shadowJar) << {
     if (project.hasProperty('cassandraVersion')) {
         copy {
             from('build/libs') {
-              include('*-all.jar')
+                include('*-all.jar')
             }
             into System.getProperty('user.home') + '/.ccm/repository/' + project.property('cassandraVersion') + '/lib'
         }
@@ -126,7 +130,7 @@ task copySamples(type: Copy) {
 
 task copyJar(type: Copy) {
     dependsOn([shadowJar, copySamples])
-    from ('build/libs'){
+    from('build/libs') {
         include('*-all.jar')
     }
     into 'build/dist/stargate/libs'
@@ -158,6 +162,21 @@ signing {
     sign configurations.archives
 }
 
+task test1(type: Test) {
+    systemProperty "pagesize", "5"
+}
+
+task test2(type: Test) {
+    systemProperty "pagesize", "10"
+}
+
+task test3(type: Test) {
+    systemProperty "pagesize", "1000"
+}
+
+task testMain(dependsOn: [test1, test2, test3]) {
+
+}
 
 uploadArchives {
     repositories {

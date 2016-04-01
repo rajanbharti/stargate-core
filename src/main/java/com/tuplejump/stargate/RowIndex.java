@@ -58,13 +58,13 @@ public class RowIndex extends PerRowSecondaryIndex {
     protected String primaryColumnName;
     protected String tableName;
     protected Options options;
-    protected RowIndexSupport rowIndexSupport;
+    public RowIndexSupport rowIndexSupport;
     protected TableMapper tableMapper;
     protected CFMetaData cfMetaData;
     private ReadWriteLock indexLock = new ReentrantReadWriteLock();
     private final Lock readLock = indexLock.readLock();
     private final Lock writeLock = indexLock.writeLock();
-    IndexContainer indexContainer;
+    public IndexContainer indexContainer;
     boolean nearRealTime = false;
     protected volatile long latest;
 

@@ -68,7 +68,6 @@ public class BasicIndexer implements Indexer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void init(Analyzer analyzer, String keyspaceName, String cfName, String indexName, String vNodeName) throws IOException {

@@ -22,7 +22,6 @@ public class MonolithIndexContainer implements IndexContainer {
     String cf;
     String indexName;
 
-
     public MonolithIndexContainer(Analyzer analyzer, String keyspace, String cf, String indexName) {
         this.analyzer = analyzer;
         this.keyspace = keyspace;
@@ -62,7 +61,6 @@ public class MonolithIndexContainer implements IndexContainer {
     @Override
     public void commit() {
         indexer.commit();
-
     }
 
     @Override
