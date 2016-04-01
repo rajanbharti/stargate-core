@@ -42,7 +42,7 @@ public class RowIndexSupportTest extends IndexTestBase {
     public static CharsetEncoder encoder = charset.newEncoder();
     public static CharsetDecoder decoder = charset.newDecoder();
 
-    public static ByteBuffer str_to_bb(String msg) {
+    public static ByteBuffer stringToByteBuffer(String msg) {
         try {
             return encoder.encode(CharBuffer.wrap(msg));
         } catch (Exception e) {
@@ -51,6 +51,7 @@ public class RowIndexSupportTest extends IndexTestBase {
         return null;
     }
 
+    @Before
     public void setup() {
         createKS("keyspace1");
         getSession().execute("USE keyspace1;");
@@ -112,14 +113,11 @@ public class RowIndexSupportTest extends IndexTestBase {
 
     @Test
     public void rowIndexTest() {
-        setup();
-
         SecondaryIndexManager indexManager = Keyspace.open("keyspace1").getColumnFamilyStore("tag2").indexManager;
         ColumnFamily cf = ArrayBackedSortedColumns.factory.create("keyspace1", "tag2");
         RowIndex ri = (RowIndex) indexManager.getIndexes().iterator().next();
-        ByteBuffer rowKey = str_to_bb("magic");
+        ByteBuffer rowKey = stringToByteBuffer("magic");
         RowIndexSupport support = ri.rowIndexSupport;
-
         try {
             DecoratedKey key = support.tableMapper.decorateKey(rowKey);
             Indexer indexer = ri.indexContainer.indexer(key);
@@ -136,8 +134,6 @@ public class RowIndexSupportTest extends IndexTestBase {
             dropTable("keyspace1", "tag2");
             dropKS("keyspace1");
         }
-
-
     }
 
 }
