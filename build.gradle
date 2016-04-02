@@ -59,6 +59,8 @@ dependencies {
     //testing dependencies
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
+    testCompile('org.mockito:mockito-all:1.10.19')
+
     testCompile('com.datastax.cassandra:cassandra-driver-core:2.1.8') {
         exclude group: 'org.apache.cassandra', module: 'cassandra-all'
         exclude group: 'log4j'

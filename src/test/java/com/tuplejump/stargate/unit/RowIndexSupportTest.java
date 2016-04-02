@@ -22,6 +22,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.Assert.*;
 import org.apache.lucene.document.*;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -32,21 +37,23 @@ import java.nio.charset.CharsetEncoder;
 import java.util.Arrays;
 import java.util.List;
 
+@RunWith(MockitoJUnitRunner.class)
 public class RowIndexSupportTest extends IndexTestBase {
 
-    public RowIndexSupportTest() {
-        cassandraCQLUnit = CQLUnitD.getCQLUnit(null);
-    }
 
     public static Charset charset = Charset.forName("UTF-8");
     public static CharsetEncoder encoder = charset.newEncoder();
     public static CharsetDecoder decoder = charset.newDecoder();
 
-    public static ByteBuffer stringToByteBuffer(String msg) {
+    public RowIndexSupportTest() {
+        cassandraCQLUnit = CQLUnitD.getCQLUnit(null);
+    }
+
+    public ByteBuffer stringToByteBuffer(String msg) {
         try {
             return encoder.encode(CharBuffer.wrap(msg));
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("cannot convert to ByteBuffer", e);
         }
         return null;
     }
@@ -121,6 +128,7 @@ public class RowIndexSupportTest extends IndexTestBase {
         try {
             DecoratedKey key = support.tableMapper.decorateKey(rowKey);
             Indexer indexer = ri.indexContainer.indexer(key);
+            //   Indexer indexer1 = Mockito.spy(indexer);
             Long oldCount = ri.indexContainer.indexer(key).approxRowCount();
             insert();
             try {
@@ -128,6 +136,7 @@ public class RowIndexSupportTest extends IndexTestBase {
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
             }
+            //   Mockito.verify(indexer1, Mockito.times(20)).upsert(Mockito.any(), Mockito.any());
             Long newCount = ri.indexContainer.indexer(key).approxRowCount();
             Assert.assertEquals(20, newCount - oldCount);
         } finally {
