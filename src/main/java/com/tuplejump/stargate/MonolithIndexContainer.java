@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class MonolithIndexContainer implements IndexContainer {
     protected static final Logger logger = LoggerFactory.getLogger(RowIndex.class);
-    Indexer indexer;
+    public Indexer indexer;
     Analyzer analyzer;
     String keyspace;
     String cf;
