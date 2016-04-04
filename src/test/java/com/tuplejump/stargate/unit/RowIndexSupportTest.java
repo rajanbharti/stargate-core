@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,9 +27,6 @@ import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RowIndexSupportTest extends IndexTestBase {
-
-    @Mock
-    BasicIndexer mockIndexer;
 
     public RowIndexSupportTest() {
         cassandraCQLUnit = CQLUnitD.getCQLUnit(null);
@@ -77,7 +75,7 @@ public class RowIndexSupportTest extends IndexTestBase {
         RowIndex ri = (RowIndex) indexManager.getIndexes().iterator().next();
         RowIndexSupport support = ri.rowIndexSupport;
         try {
-
+            BasicIndexer mockIndexer = mock(BasicIndexer.class);
             MonolithIndexContainer container = (MonolithIndexContainer) ri.indexContainer;
             container.indexer = mockIndexer; //assigning a mock indexer to container
             insert();
